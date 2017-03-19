@@ -6,6 +6,8 @@ bool rebuild = false;
 
 bool nextPeriod = false;
 
+bool back = false;
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -23,10 +25,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
     else
         rebuild = false;
+    
     if((key == GLFW_KEY_SPACE) && (action == GLFW_RELEASE)){
         nextPeriod = true;
     }
     else
         nextPeriod = false;
-    
+
+    if((key == GLFW_KEY_Z) && (action == GLFW_RELEASE)){
+        back = true;
+    }
+    else
+        back = false;    
 }

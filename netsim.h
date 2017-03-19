@@ -33,14 +33,14 @@ class NetSim{
 		void input();
 		void redraw();
 		Sensors m_sensors;
-		std::stack<Sensors*> m_states;
+		//std::vector<Sensors*> m_states;
 
 		Text m_textEngine;
 
 		Shader m_sensShader;
 		Shader m_textShader;
+
 		int m_numSensors;
-		int m_period;
 };
 
 #endif

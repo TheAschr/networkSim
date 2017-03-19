@@ -20,29 +20,28 @@
 
 #include "window.h"
 
-
-const float INT_RAD = 0.005f;
-const float INT_PRECISION = 10;
-const float PI = 3.1415926f;
+const GLfloat PI = 3.14159265358979f;
 
 class Circle{
 public:
-    Circle(Shader& shader,glm::vec2& position, GLfloat radius,const int precision);
-    virtual ~Circle(){
+    Circle(const glm::vec2& position,const GLfloat radius,const int precision);
+    ~Circle(){
         glDeleteVertexArrays(1, &m_vao);
         glDeleteBuffers(1, &m_vbo);
     }
-    void draw(const glm::vec4& color);
-    glm::vec2 getPos(){return m_position;}
-    GLfloat getRad(){return m_radius;}
-    std::vector<glm::vec2> getInts(Circle& circle);
+
+    void draw(Shader& shader,const glm::vec4& color);
+
+    glm::vec2 getPos() const {return m_position;}
+    GLfloat getRad() const {return m_radius;}
+
+    std::vector<glm::vec2> getInts(const Circle& circle) const ;
+
 private: 
-    Shader* m_shader;
     glm::vec2 m_position;
     GLfloat m_radius;
+    GLuint m_verts;
     GLuint m_vbo,m_vao;
-    int m_verts;
-    int m_precision;
 };
 
 #endif

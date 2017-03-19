@@ -21,22 +21,22 @@ namespace INTERSECTIONS{
 struct Sensor
 {
 
-	Sensor(Shader& shader,glm::vec2& position,GLfloat radius,glm::vec3 color):
+	Sensor(glm::vec2& position,GLfloat radius,glm::vec3 color):
 		m_energy(SENSOR::DEFAULT_ENERGY),
 		m_position(position),
 		m_radius(radius),
 		m_color(color),
-		m_circle(shader,position,radius,SENSOR::DEFAULT_PRECISION),
+		m_circle(position,radius,SENSOR::DEFAULT_PRECISION),
 		active(true),
 		alive(true){}
 
-	void draw(){
+	void draw(Shader& shader){
 		//m_circle.draw(glm::vec4( glm::vec3(sin(glfwGetTime()*m_color.x)/2+0.5,sin(glfwGetTime()*m_color.y)/2+0.5,sin(glfwGetTime()*m_color.z)/2+0.5),(float)m_energy/SENSOR::DEFAULT_ENERGY));
 		if(active)
-			m_circle.draw(glm::vec4(SENSOR::COLORS[1],(float)m_energy/SENSOR::DEFAULT_ENERGY));
+			m_circle.draw(shader,glm::vec4(SENSOR::COLORS[1],(float)m_energy/SENSOR::DEFAULT_ENERGY));
 			//m_circle.draw(glm::vec4( glm::vec3(sin(glfwGetTime()*m_color.x)/2+0.5,sin(glfwGetTime()*m_color.y)/2+0.5,sin(glfwGetTime()*m_color.z)/2+0.5),(float)m_energy/SENSOR::DEFAULT_ENERGY));
 		else
-			m_circle.draw(glm::vec4(SENSOR::COLORS[0],(float)m_energy/SENSOR::DEFAULT_ENERGY));
+			m_circle.draw(shader,glm::vec4(SENSOR::COLORS[0],(float)m_energy/SENSOR::DEFAULT_ENERGY));
 			//m_circle.draw(glm::vec4(SENSOR::COLORS[0],sin(glfwGetTime()*6)/2+0.5));
 
 	}
@@ -63,23 +63,26 @@ struct Sensor
 class Sensors{
 	public:
 		Sensors(Shader& shader,const int numSensors,const int sensRad);
-		virtual ~Sensors(){
-			m_sensors.clear();
+		//Sensors(Sensors& sensors);
+		~Sensors(){
+			//m_sensors.clear();
 		}
 		void draw();
 		void drawInts();
 
 		void build(const int numSensors);
 		
-		int getInts(){return m_intersections;}
-		int getOptTimes(){return m_optTimes;}
-		void setInts();
-		void setActive();
-		
-		Sensors* optimize();
+		int getInts() const {return m_intersections;}	
+		int getAlive() const {return m_alive;}
+		int getActive() const {return m_active;}
+		int getOptTimes() const {return m_optTimes;}
+		//std::vector<Sensors*> getSensors()const{return m_sensors;}
+		void optimize() ;
 	private:
 
 		bool redundant(Sensor* sensor);
+		void setInts();
+		void setActive();
 
 		Shader* m_shader;
 		int m_sensRad;
@@ -87,6 +90,7 @@ class Sensors{
 		int m_intersections;
 		int m_active;
 		int m_alive;
+		int m_numSens;
 		int m_optTimes;
 
 };

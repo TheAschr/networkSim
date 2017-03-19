@@ -1,10 +1,9 @@
 #include "circle.h"
 
-Circle::Circle(Shader& shader,glm::vec2& position, GLfloat radius,const int precision) : m_position(position), m_radius(radius), m_precision(precision){
-	m_shader = &shader;
+Circle::Circle(const glm::vec2& position,const GLfloat radius,const int precision) : m_position(position), m_radius(radius){
 
 	std::vector<GLfloat> result;
-	float increment = 2.0f * PI / (pow(10,m_precision)/(WINDOW::SCREEN_W*WINDOW::SCREEN_H));
+	float increment = 2.0f * PI / (pow(10,precision)/(WINDOW::SCREEN_W*WINDOW::SCREEN_H));
 
 	m_verts = 0;
 	for (float currAngle = 0.0f; currAngle <= 2.0f * PI; currAngle += increment)
@@ -15,7 +14,6 @@ Circle::Circle(Shader& shader,glm::vec2& position, GLfloat radius,const int prec
 	    //std::cout << " " << radius * sin(currAngle) +m_position.y <<std::endl;
 		m_verts++;
 	}
-
 
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, &m_vbo);
@@ -35,21 +33,16 @@ Circle::Circle(Shader& shader,glm::vec2& position, GLfloat radius,const int prec
 }
 
 
-void Circle::draw(const glm::vec4& color)
+void Circle::draw(Shader& shader,const glm::vec4& color)
 {
-	m_shader->Use();
-
-	GLuint colorLoc = glGetUniformLocation(m_shader->Program, "vColor");
-	glUniform4fv(colorLoc, 1, glm::value_ptr(color));
-
+	glUniform4fv(glGetUniformLocation(shader.Program, "vColor"), 1, glm::value_ptr(color));
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_LINE_LOOP, 0, m_verts);
 	glBindVertexArray(0);
-	//std::cout << m_verts << std::endl;
 }
 
 
-std::vector<glm::vec2> Circle::getInts(Circle& circle){
+std::vector<glm::vec2> Circle::getInts(const Circle& circle) const{
 	
 	std::vector<glm::vec2> temp;
 

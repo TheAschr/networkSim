@@ -1,12 +1,15 @@
 #include "sensors.h"
 
-Sensors::Sensors(Shader& shader,const int numSensors,const int sensRad){
-	m_intersections = 0;
-	m_optTimes = 0;
-	m_shader = &shader;
-	m_sensRad = sensRad;
-	m_active = numSensors;
-	m_alive = numSensors;
+Sensors::Sensors(Shader& shader,const int numSensors,const int sensRad):
+m_intersections(0),
+m_shader(&shader),
+m_numSens(numSensors),
+m_sensRad(sensRad),
+m_active(numSensors),
+m_alive(numSensors),
+m_optTimes(0)
+{
+
 
 }
 
@@ -14,7 +17,6 @@ void Sensors::build(const int numSensors){
 
 	m_sensors.clear();
 	m_intersections = 0;
-	m_optTimes = 0;
 
 	glm::vec2 position;
 
@@ -27,7 +29,8 @@ void Sensors::build(const int numSensors){
 	for(int i = 0; i < numSensors;i++){
 
 		position = glm::vec2(rPos(gen),rPos(gen));
-		Sensor* temp = new Sensor(*m_shader,position,(5.0f/WINDOW::MAP_SIZE_W),glm::vec3(rColor(gen),rColor(gen),rColor(gen))); 
+		//Sensor* temp = new Sensor(position,(5.0f/WINDOW::MAP_SIZE_W),glm::vec3(rColor(gen),rColor(gen),rColor(gen)));
+		Sensor* temp = new Sensor(position,rRad(gen),glm::vec3(rColor(gen),rColor(gen),rColor(gen))); 
 //		Sensor* temp = new Sensor(*m_shader,position,0.2f,SENSOR::COLORS[0]); 
 
 		temp->active = true;
@@ -36,12 +39,17 @@ void Sensors::build(const int numSensors){
 	 setInts();
 }
 
+// Sensors::Sensors(Sensors& sensors){
+// 	m_intersections = sensors.getInts();
+// 	m_sensors = sensors.getSensors();
+// }
+
 
 void Sensors::draw(){
 	//sin(glfwGetTime())/2+0.5
 	for(int i = 0; i < m_sensors.size();i++){
-		if(m_sensors[i]->alive)
-			m_sensors[i]->draw();
+		if(m_sensors[i]->active)
+			m_sensors[i]->draw(*m_shader);
 	}
 }
 
@@ -63,8 +71,8 @@ void Sensors::drawInts(){
 	for(int i = 0; i < m_sensors.size();i++){
 		if(m_sensors[i]->active && m_sensors[i]->m_energy>0)
 		for(int j =0; j < m_sensors[i]->m_intersections.size();j++){
-			Circle temp(*m_shader,m_sensors[i]->m_intersections[j],INTERSECTIONS::DEFAULT_RAD,INTERSECTIONS::DEFAULT_PRECISION);
-			temp.draw(glm::vec4(1.0f,1.0f,1.0f,0.3f));
+			Circle temp(m_sensors[i]->m_intersections[j],INTERSECTIONS::DEFAULT_RAD,INTERSECTIONS::DEFAULT_PRECISION);
+			temp.draw(*m_shader,glm::vec4(1.0f,1.0f,1.0f,0.3f));
 
 		}
 	}
@@ -103,33 +111,49 @@ void Sensors::setActive(){
 
 	for(int i = 0; i < m_sensors.size();i++){
 		if(m_sensors[i]->active)
-			m_sensors[i]->m_energy-=10;
+			m_sensors[i]->m_energy-=100;
 		if(m_sensors[i]->m_energy <=0){
 			m_sensors[i]->alive = false;
+			m_alive--;
 			m_sensors[i]->active = false;
 		}
 		if(m_sensors[i]->alive){
 			if(m_sensors[i]->m_intersections.size()){
+//			float time1 = glfwGetTime();
+
 			if(redundant(m_sensors[i]))
 				m_sensors[i]->active = false;	
 			else
 				m_sensors[i]->active = true;						
+			// std::cout << "Redundancy Time: " << time1 - glfwGetTime() << std::endl;
+
 			}
 
 		}
 
 	}
 
+
+
 }
 
-Sensors* Sensors::optimize(){
+void Sensors::optimize() {
+	//Sensors* optSensor = new Sensors(*this);
+	//Sensors* optSensor(*m_shader,m_numSens,m_sensRad);
+	//Sensors optSensor(*m_shader,m_numSens,m_sensRad);
+	float time1 = glfwGetTime();
+	//std::cout << m_alive << std::endl;
+	//std::cout << "TEST" << std::endl;
 	m_optTimes++;
-	Sensors* optSensor = new Sensors(*this);
-	//int time1 = glfwGetTime();
-	optSensor->setActive();
-	//std::cout << "Time to setActive: " << glfwGetTime() - time1 << std::endl;
+	setActive();
+	//optSensor->build(optSensor->getActive());
+
+	//optSensor->setActive();
+	//optSensor->setInts();
+	std::cout << "Time to setActive: " << glfwGetTime() - time1 << std::endl;
 	//time1 = glfwGetTime();
 	//optSensor->setInts();
 	//std::cout << "Time to set INTERSECTIONS: " << glfwGetTime() - time1 << std::endl;
-	return optSensor;
+	//std::cout << optSensor << std::endl;
+//	return &*this;
 }
