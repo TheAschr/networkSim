@@ -15,7 +15,7 @@
 #include "window.h"
 #include "netsim.h"
 
-int NUM_SENSORS = 1900;
+int NUM_SENSORS = 500;
 
 int main(int argc, const char * argv[]) {
     srand(time(NULL));

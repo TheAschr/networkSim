@@ -11,6 +11,7 @@
 
 namespace SENSOR{
 	const int DEFAULT_ENERGY = 300;
+	const int DEFAULT_ENERGY_LOSS = 10;
 	const int DEFAULT_PRECISION = 8;
 	const glm::vec3  COLORS[3] = {glm::vec3(1.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f),glm::vec3(0.0f,0.0f,1.0f) };
 }
@@ -27,9 +28,7 @@ struct Sensor
 		m_radius(radius),
 		m_color(color),
 		m_circle(position,radius,SENSOR::DEFAULT_PRECISION),
-		active(true),
-		alive(true){}
-
+		active(true){}
 	void draw(Shader& shader){
 		//m_circle.draw(glm::vec4( glm::vec3(sin(glfwGetTime()*m_color.x)/2+0.5,sin(glfwGetTime()*m_color.y)/2+0.5,sin(glfwGetTime()*m_color.z)/2+0.5),(float)m_energy/SENSOR::DEFAULT_ENERGY));
 		if(active)
@@ -49,7 +48,6 @@ struct Sensor
 	}
 
 	bool active;
-	bool alive;
 	GLfloat m_radius;
 	int m_energy;
 	glm::vec3 m_color;
@@ -73,7 +71,7 @@ class Sensors{
 		void build(const int numSensors);
 		
 		int getInts() const {return m_intersections;}	
-		int getAlive() const {return m_alive;}
+		int getAlive() const {return m_sensors.size();}
 		int getActive() const {return m_active;}
 		int getOptTimes() const {return m_optTimes;}
 		//std::vector<Sensors*> getSensors()const{return m_sensors;}
@@ -83,13 +81,13 @@ class Sensors{
 		bool redundant(Sensor* sensor);
 		void setInts();
 		void setActive();
+		bool setPower();
 
 		Shader* m_shader;
 		int m_sensRad;
 		std::vector<Sensor*> m_sensors;
 		int m_intersections;
 		int m_active;
-		int m_alive;
 		int m_numSens;
 		int m_optTimes;
 
