@@ -13,15 +13,19 @@
 #include <stack>
 #include "shader.h"
 #include "sensors.h"
+#include <sstream>
+#include "graph.h"
 
 #include "glm/ext.hpp"
 #include "text.h"
+
+#include "graph.h"
 
 class NetSim{
 	public:
 		NetSim(GLFWwindow* window,const int numSensors);
 		~NetSim(){
-		};
+		}
 		void run();
 
 	private:
@@ -39,8 +43,11 @@ class NetSim{
 
 		Shader m_sensShader;
 		Shader m_textShader;
+		Shader m_graphShader;
 
 		int m_numSensors;
+
+		Graph m_graph;
 };
 
 #endif

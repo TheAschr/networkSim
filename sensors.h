@@ -11,7 +11,7 @@
 
 namespace SENSOR{
 	const int DEFAULT_ENERGY = 300;
-	const int DEFAULT_ENERGY_LOSS = 10;
+	const int DEFAULT_ENERGY_LOSS = 300;
 	const int DEFAULT_PRECISION = 8;
 	const glm::vec3  COLORS[3] = {glm::vec3(1.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f),glm::vec3(0.0f,0.0f,1.0f) };
 }

@@ -41,26 +41,20 @@ void Sensors::build(const int numSensors){
 }
 
 void Sensors::draw(){
-	//sin(glfwGetTime())/2+0.5
-	for(int i = 0; i < m_sensors.size();i++){
-	//	if(m_sensors[i]->alive)
-			m_sensors[i]->draw(*m_shader);
-	}
+	for(int i = 0; i < m_sensors.size();i++)
+		m_sensors[i]->draw(*m_shader);
+	
 }
 
 void Sensors::setInts(){
 	m_intersections = 0;
 	for(int i = 0; i < m_sensors.size();i++){
-		//if(m_sensors[i]->alive){
 		m_sensors[i]->m_intersections.clear();
 
-			for(int j = 0; j < m_sensors.size();j++){
-				m_sensors[i]->setInts(*m_sensors[j]);
-		//	}
-		}
+		for(int j = 0; j < m_sensors.size();j++)
+			m_sensors[i]->setInts(*m_sensors[j]);
 
 		m_intersections+=m_sensors[i]->m_intersections.size();
-
 	}
 }
 
@@ -103,39 +97,37 @@ bool Sensors::redundant(Sensor *s0){
 
 
 bool Sensors::setPower(){
+	std::vector<Sensor*> temp;
 	bool died = false;
 	for(int i = 0; i < m_sensors.size();i++){
+		if(m_sensors[i]->m_energy>0)
+			temp.push_back(m_sensors[i]);
+		else
+			died = true;
 		if(m_sensors[i]->active)
 			m_sensors[i]->m_energy-=SENSOR::DEFAULT_ENERGY_LOSS;
-		if(m_sensors[i]->m_energy <=0){
-			m_sensors.erase(m_sensors.begin()+i);
-			died = true;
-		}
 	}
+	m_sensors = temp;
 	return died;
 }
 
 void Sensors::setActive(){
-	int r = 0;
 	m_active = m_sensors.size();
 	for(int i = 0; i < m_sensors.size();i++){
 		if(redundant(m_sensors[i])){
 			m_sensors[i]->active = false;
-			r++;
 			m_active--;
 		}
-		//else
-		//	m_sensors[i]->active = true;
+		else
+			m_sensors[i]->active = true;
 	}
-	std::cout << r << std::endl;
 }
 
 void Sensors::optimize() {
-
 	m_optTimes++;
 	if(setPower()){
+		std::random_shuffle (m_sensors.begin(), m_sensors.end());
 		setInts();
 		setActive();
 	}
-
 }
