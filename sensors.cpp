@@ -14,7 +14,7 @@ grid(1,COLORS::WHITE),
 active(2,COLORS::BLUE),
 coverage(3,COLORS::GREEN),
 v(glm::vec2(0.0f,1.0f),glm::vec2(0.0f,-1.0f)),
-h(glm::vec2(-1.0f,0.0f),glm::vec2(10.0f,0.0f))
+h(glm::vec2(-1.0f,0.0f),glm::vec2(100.0f,0.0f))
 {}
 
 void Sensors::build(std::vector<Sensor*> sensors,const SENSOR::ALGORITHMS algorithm){
@@ -238,9 +238,9 @@ void Sensors::setActive(){
 
 void Sensors::optimize(){
 	
-	glm::vec2 lastAlive((float)m_optTimes*0.01f,(float)(getAlive())/(float)m_numSens);
-	glm::vec2 lastActive((float)m_optTimes*0.01f,(float)(getActive())/(float)m_numSens);
-	glm::vec2 lastCov((float)m_optTimes*0.01f,getCoverage());
+	glm::vec2 lastAlive((float)m_optTimes * 0.01f,(float)(getAlive())/(float)m_numSens);
+	glm::vec2 lastActive((float)m_optTimes * 0.01f,(float)(getActive())/(float)m_numSens);
+	glm::vec2 lastCov((float)m_optTimes * 0.01f,getCoverage());
 
 	m_optTimes++;
 	if(setPower())
@@ -248,9 +248,9 @@ void Sensors::optimize(){
 	setActive();
 	setCoverage(10000);
 	
-	glm::vec2 currAlive((float)m_optTimes*0.01f,(float)(getAlive())/(float)m_numSens);
-	glm::vec2 currActive((float)m_optTimes*0.01f,(float)(getActive())/(float)m_numSens);
-	glm::vec2 currCov((float)m_optTimes*0.01f,getCoverage());
+	glm::vec2 currAlive((float)m_optTimes * 0.01f,(float)(getAlive())/(float)m_numSens);
+	glm::vec2 currActive((float)m_optTimes * 0.01f,(float)(getActive())/(float)m_numSens);
+	glm::vec2 currCov((float)m_optTimes * 0.01f,getCoverage());
 
 	Line aliveL(currAlive,lastAlive);
 	Line activeL(currActive,lastActive);

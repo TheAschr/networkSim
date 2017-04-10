@@ -68,11 +68,10 @@ void NetSim::redraw(){
 	m_textEngine.render("Algorithm: " + std::to_string(1+(int)m_sensors[(int)m_curSensors].m_algorithm) +
 		" Alive: " + alive.str() + 
 		"\% Active: " + active.str() +  
-		"\% GLuintersections: " + std::to_string(m_sensors[(int)m_curSensors].getIntersects()) + 
+		"\% Intersections: " + std::to_string(m_sensors[(int)m_curSensors].getIntersects()) + 
 		" Coverage: " + coverage.str() + 
 		"\% Period: " + std::to_string(m_sensors[(int)m_curSensors].getOptTimes()) 
-		, 10.0f, 10.0f, 0.5f, glm::vec3(1.0f,1.0f,1.0f));
-
+		, 10.0f, 10.0f, (float)WINDOW::SCREEN_W * 0.0005f, COLORS::WHITE);
 	glfwSwapBuffers(m_window);
 }
 

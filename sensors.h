@@ -14,10 +14,10 @@
 
 namespace SENSOR{
 	const GLuint DEFAULT_ENERGY = 300;
-	const GLuint DEFAULT_ENERGY_LOSS = 10;
-	const GLuint DEFAULT_PRECISION = 8;
-	const GLfloat DEFAULT_RADIUS_LOWER = 5.0f;
-	const GLfloat DEFAULT_RADIUS_UPPER = 5.0f;
+	const GLuint DEFAULT_ENERGY_LOSS = 1;
+	const GLuint DEFAULT_PRECISION = 9;
+	const GLfloat DEFAULT_RADIUS_LOWER = 10.0f;
+	const GLfloat DEFAULT_RADIUS_UPPER = 10.0f;
 	const GLfloat DEFAULT_COLOR_LOWER = 0.0f;
 	const GLfloat DEFAULT_COLOR_UPPER = 1.0f;
 

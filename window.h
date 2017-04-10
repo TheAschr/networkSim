@@ -16,8 +16,8 @@
 #include <iostream>
 
 namespace WINDOW{
-	const GLfloat SCREEN_W = 900;
-	const GLfloat SCREEN_H = 900;
+	const GLfloat SCREEN_W = 3840;
+	const GLfloat SCREEN_H = 2160;
 
 	const GLuint MAP_SIZE_W = 50;
 	const GLuint MAP_SIZE_H = 50;
