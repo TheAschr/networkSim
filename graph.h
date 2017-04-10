@@ -59,6 +59,10 @@ class Graph{
 
 		void draw();
 		void buffer();
+		void clear(){
+			m_functions.clear();
+			m_buffer.clear();
+		}
 
 	private:
 		std::vector<Function> m_functions;

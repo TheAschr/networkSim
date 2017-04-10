@@ -1,43 +1,54 @@
 #include "sensors.h"
 
-Sensors::Sensors(Shader& shader,const int numSensors,const int sensRad):
+Sensors::Sensors(Shader& shader,Shader& gShader,const int numSensors,const int sensRad):
 m_intersections(0),
 m_shader(&shader),
+m_graphShader(&gShader),
+m_graph(gShader),
 m_numSens(numSensors),
 m_sensRad(sensRad),
 m_active(numSensors),
-m_optTimes(0)
+m_optTimes(0),
+alive(0,glm::vec3(1.0f,0.0f,0.0f)),
+grid(1,glm::vec3(1.0f,1.0f,1.0f)),
+active(2,glm::vec3(0.0f,0.0f,1.0f)),
+coverage(3,glm::vec3(0.0f,1.0f,0.0f)),
+v(glm::vec2(0.0f,1.0f),glm::vec2(0.0f,-1.0f)),
+h(glm::vec2(-1.0f,0.0f),glm::vec2(1.0f,0.0f))
 {
+
 
 
 }
 
-void Sensors::build(const int numSensors){
+void Sensors::build(std::vector<Sensor*> sensors,int algorithm){
 
 	m_optTimes = 0;
 	m_sensors.clear();
 	m_intersections = 0;
+	m_algorithm = algorithm;
 
-	glm::vec2 position;
+	m_sensors = sensors;
+	setInts();
+	setActive();
+	setCoverage(10000);
 
-	std::random_device rd;  
-	std::mt19937 gen(rd());
-	std::uniform_real_distribution<GLfloat> rPos(-1.0,1.0);
-	std::uniform_real_distribution<GLfloat> rRad(0.05,0.5);
-	std::uniform_real_distribution<GLfloat> rColor(0.0,1.0);
+	for(int i =0; i < 4;i++)
+		m_graph.resetFunction(i);
+	
+	m_graph.addFunction(alive);
+	m_graph.addFunction(grid);
+	m_graph.addFunction(active);
+	m_graph.addFunction(coverage);
 
-	for(int i = 0; i < numSensors;i++){
+	m_graph.addLine(h,1);
+	m_graph.addLine(v,1);
+	m_graph.buffer();
 
-		position = glm::vec2(rPos(gen),rPos(gen));
-		//Sensor* temp = new Sensor(position,(5.0f/WINDOW::MAP_SIZE_W),glm::vec3(rColor(gen),rColor(gen),rColor(gen)));
-		Sensor* temp = new Sensor(position,rRad(gen),glm::vec3(rColor(gen),rColor(gen),rColor(gen))); 
-//		Sensor* temp = new Sensor(*m_shader,position,0.2f,SENSOR::COLORS[0]); 
 
-		temp->active = true;
-		m_sensors.push_back(temp);
-	}
-	 setInts();
-	 setActive();
+
+
+
 }
 
 void Sensors::draw(){
@@ -95,6 +106,101 @@ bool Sensors::redundant(Sensor *s0){
 
 }
 
+int Sensors::nonCoveredPoints(Sensor *s0){
+	int p = s0->m_intersections.size();
+	for(int i = 0; i < s0->m_intersections.size();i++){
+		bool contains = false;
+		int s1 = 0;
+		while(s1 < m_sensors.size()){
+			GLfloat distance = std::abs( sqrt( pow(m_sensors[s1]->m_position.x - s0->m_intersections[i].x,2) + pow(m_sensors[s1]->m_position.y - s0->m_intersections[i].y, 2) ) );
+			if(distance + pow(10,-6) < m_sensors[s1]->m_radius)
+				contains = true;
+			s1++;
+		}
+		if(contains)
+			p--;
+	}
+	return p;
+}
+
+
+void Sensors::setCoverage(const int precision){
+	std::random_device rd;  
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<GLfloat> rPos(-1.0,1.0);
+	
+	int p = 0;
+
+	for(int i = 0; i < precision; i++){
+			glm::vec2 position = glm::vec2(rPos(gen),rPos(gen));
+			bool contains = false;
+			int s1 = 0;
+			while(s1 < m_sensors.size() && !contains){
+				GLfloat distance = std::abs( sqrt( pow(m_sensors[s1]->m_position.x - position.x,2) + pow(m_sensors[s1]->m_position.y - position.y, 2) ) );
+				if(distance + pow(10,-6) < m_sensors[s1]->m_radius && m_sensors[s1]->active)
+					contains = true;
+				s1++;
+			}
+			if(contains)
+				p++;
+	}
+	m_coverage = (float)(p)/precision;
+}
+
+void Sensors::allActive(){
+	m_active = m_sensors.size();
+	for(int i = 0; i < m_sensors.size();i++)
+		m_sensors[i]->active = true;
+}
+
+void Sensors::randBotUp(){
+
+	std::random_shuffle (m_sensors.begin(), m_sensors.end());
+
+	m_active = 0;
+	for(int i = 0; i < m_sensors.size();i++){
+		if(!redundant(m_sensors[i])){
+			m_sensors[i]->active = true;
+			m_active++;
+		}
+		else
+			m_sensors[i]->active = false;
+	}
+}
+
+void Sensors::randTopDown(){
+	std::random_shuffle (m_sensors.begin(), m_sensors.end());
+
+	m_active = m_sensors.size();
+	for(int i = 0; i < m_sensors.size();i++){
+		if(redundant(m_sensors[i])){
+			m_sensors[i]->active = false;
+			m_active--;
+		}
+		else
+			m_sensors[i]->active = true;
+	}
+}
+
+void Sensors::weightedBotUp(){
+	std::vector<std::pair<int, int> > temp;
+	m_active = 0;
+	for(int i = 0; i < m_sensors.size();i++){
+		int p = nonCoveredPoints(m_sensors[i]);
+		temp.push_back(std::make_pair(i,p));
+	}
+	std::sort(temp.begin(),temp.end(),[](auto &left, auto &right){return left.second > right.second;});
+
+	for(int i = 0; i < temp.size();i++){
+		if(!redundant(m_sensors[temp[i].first])){
+			m_sensors[temp[i].first]->active = true;
+			m_active++;
+		}
+		else
+			m_sensors[temp[i].first]->active = false;
+	}
+}
+
 
 bool Sensors::setPower(){
 	std::vector<Sensor*> temp;
@@ -112,22 +218,51 @@ bool Sensors::setPower(){
 }
 
 void Sensors::setActive(){
-	m_active = m_sensors.size();
-	for(int i = 0; i < m_sensors.size();i++){
-		if(redundant(m_sensors[i])){
-			m_sensors[i]->active = false;
-			m_active--;
+	for(int i = 0; i< m_sensors.size();i++)
+		m_sensors[i]->active =false;
+		switch(m_algorithm){
+			case 0:
+			randBotUp();
+			break;
+			case 1:
+			randTopDown();
+			break;
+			case 2:
+			allActive();
+			break;
+			case 3:
+			weightedBotUp();
+			break;
 		}
-		else
-			m_sensors[i]->active = true;
-	}
 }
 
 void Sensors::optimize() {
+	glm::vec2 lastAlive((float)m_optTimes*0.01f,(float)(getAlive())/(float)m_numSens);
+	glm::vec2 lastActive((float)m_optTimes*0.01f,(float)(getActive())/(float)m_numSens);
+	glm::vec2 lastCov((float)m_optTimes*0.01f,getCoverage());
+
 	m_optTimes++;
 	if(setPower()){
-		std::random_shuffle (m_sensors.begin(), m_sensors.end());
 		setInts();
 		setActive();
+		setCoverage(10000);
 	}
+	// setPower();
+	// setInts();
+	// setActive();
+	// setCoverage(10000);
+	
+	glm::vec2 currAlive((float)m_optTimes*0.01f,(float)(getAlive())/(float)m_numSens);
+	glm::vec2 currActive((float)m_optTimes*0.01f,(float)(getActive())/(float)m_numSens);
+	glm::vec2 currCov((float)m_optTimes*0.01f,getCoverage());
+
+	Line aliveL(currAlive,lastAlive);
+	Line activeL(currActive,lastActive);
+	Line covL(currCov,lastCov);
+	//std::cout << "(" << lastAlive.x  << "," << lastAlive.y << ")" << " to " << "(" << currAlive.x << "," << currAlive.y << ")" << std::endl;
+	m_graph.addLine(aliveL,0);
+	m_graph.addLine(activeL,2);
+	m_graph.addLine(covL,3);
+
+	m_graph.buffer();
 }

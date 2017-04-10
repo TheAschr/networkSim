@@ -8,10 +8,11 @@
 #include <random>
 #include "window.h"
 #include <iomanip>
+#include "graph.h"
 
 namespace SENSOR{
 	const int DEFAULT_ENERGY = 300;
-	const int DEFAULT_ENERGY_LOSS = 300;
+	const int DEFAULT_ENERGY_LOSS = 10;
 	const int DEFAULT_PRECISION = 8;
 	const glm::vec3  COLORS[3] = {glm::vec3(1.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f),glm::vec3(0.0f,0.0f,1.0f) };
 }
@@ -60,15 +61,16 @@ struct Sensor
 
 class Sensors{
 	public:
-		Sensors(Shader& shader,const int numSensors,const int sensRad);
+		Sensors(Shader& shader,Shader& gShader,const int numSensors,const int sensRad);
 		//Sensors(Sensors& sensors);
 		~Sensors(){
 			//m_sensors.clear();
 		}
 		void draw();
 		void drawInts();
+		void drawGraph(){m_graph.draw();m_graph.buffer();}
 
-		void build(const int numSensors);
+		void build(std::vector<Sensor*> sensors,int algorithm);
 		
 		int getInts() const {return m_intersections;}	
 		int getAlive() const {return m_sensors.size();}
@@ -76,12 +78,22 @@ class Sensors{
 		int getOptTimes() const {return m_optTimes;}
 		//std::vector<Sensors*> getSensors()const{return m_sensors;}
 		void optimize() ;
+		float getCoverage(){return m_coverage;}
+		void setCoverage(const int precision);
+
+		int m_algorithm;
 	private:
 
 		bool redundant(Sensor* sensor);
 		void setInts();
 		void setActive();
+		void randTopDown();
+		void randBotUp();
+		void allActive();
+		void weightedBotUp();
 		bool setPower();
+
+		int nonCoveredPoints(Sensor *s0);
 
 		Shader* m_shader;
 		int m_sensRad;
@@ -90,6 +102,18 @@ class Sensors{
 		int m_active;
 		int m_numSens;
 		int m_optTimes;
+
+		float m_coverage;
+
+		Graph m_graph;
+		Shader* m_graphShader;
+		Function alive;
+		Function grid;
+		Function active;
+		Function coverage;
+
+		Line v;
+		Line h;
 
 };
 

@@ -21,6 +21,8 @@
 
 #include "graph.h"
 
+enum class Modes { SIM , GRAPH };
+
 class NetSim{
 	public:
 		NetSim(GLFWwindow* window,const int numSensors);
@@ -36,7 +38,9 @@ class NetSim{
 		bool m_nextPeriod;
 		void input();
 		void redraw();
-		Sensors m_sensors;
+		void rebuildSensors();
+		std::vector<Sensors> m_sensors;
+		int m_curSensors;
 		//std::vector<Sensors*> m_states;
 
 		Text m_textEngine;
@@ -46,8 +50,8 @@ class NetSim{
 		Shader m_graphShader;
 
 		int m_numSensors;
+		Modes m_mode;
 
-		Graph m_graph;
 };
 
 #endif

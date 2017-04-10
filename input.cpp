@@ -8,6 +8,8 @@ bool nextPeriod = false;
 
 bool back = false;
 
+bool nextSensors = false;
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -36,5 +38,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         back = true;
     }
     else
-        back = false;    
+        back = false;  
+
+
+    if((key == GLFW_KEY_ENTER) && (action == GLFW_RELEASE)){
+        nextSensors = true;
+    }
+    else
+        nextSensors = false;     
 }
