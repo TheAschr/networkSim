@@ -18,7 +18,7 @@ void NetSim::input(){
     }
 
     if(::nextSensors){
-    	if(m_curSensors <= SENSOR::ALGORITHMS::SIZE)
+    	if(m_curSensors < SENSOR::ALGORITHMS::SIZE)
     		m_curSensors = SENSOR::ALGORITHMS((int)m_curSensors + 1);
     	else
     		m_curSensors  = SENSOR::ALGORITHMS(0);
@@ -79,7 +79,7 @@ void NetSim::redraw(){
 void NetSim::rebuildSensors(){
 	
 	m_sensors.clear();
-	std::vector<Sensor*> tS[(int)(SENSOR::ALGORITHMS)+1];
+	std::vector<Sensor*> tS[(int)(SENSOR::ALGORITHMS::SIZE)+1];
 
 	std::random_device rd;  
 	std::mt19937 gen(rd());
@@ -87,27 +87,30 @@ void NetSim::rebuildSensors(){
 	std::uniform_real_distribution<GLfloat> rRad(SENSOR::DEFAULT_RADIUS_LOWER/WINDOW::MAP_SIZE_H,SENSOR::DEFAULT_RADIUS_UPPER/WINDOW::MAP_SIZE_W);
 	std::uniform_real_distribution<GLfloat> rColor(0.0,1.0);
 
+
 	for(GLuint i = 0; i < m_numSensors;i++){
 		glm::vec2 position = glm::vec2(rPos(gen),rPos(gen));
 		GLfloat radius = rRad(gen);
 		for(GLuint j= 0 ; j <= (int)SENSOR::ALGORITHMS::SIZE ;j++){
+
 			Sensor* temp = new Sensor(position,rRad(gen),glm::vec3(rColor(gen),rColor(gen),rColor(gen))); 
 			temp->active = true;
 			tS[j].push_back(temp);
 		}
 	}
 
+
 	for(GLuint i = 0; i <= (int)SENSOR::ALGORITHMS::SIZE;i++)
 		m_sensors[i].build(tS[i],SENSOR::ALGORITHMS(i));
+	
 }
 
 void NetSim::run(){
-	for(GLuint i = 0; i <= (int)SENSOR::ALGORITHMS::SIZE; i++)
+	for(int i = 0; i <= (int)SENSOR::ALGORITHMS::SIZE; i++)
 		m_sensors.push_back(Sensors (m_sensShader,m_graphShader,m_numSensors,5));
 
 	m_running = true;
 	rebuildSensors();
-
 	while(m_running){
 		glfwPollEvents();
 		redraw();

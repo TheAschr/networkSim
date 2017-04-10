@@ -75,7 +75,7 @@ void Text::render(std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::ve
 {
     m_shader->use();
     
-    glm::mat4 projection1 = glm::ortho(0.0F, static_cast<GLfloat>(WINDOW::SCREEN_W), 0.0F, static_cast<GLfloat>(WINDOW::SCREEN_H), -1.0F, 1.0F);
+    glm::mat4 projection1 = glm::ortho(0.0F, (GLfloat)(WINDOW::SCREEN_W), 0.0F, (GLfloat)(WINDOW::SCREEN_H), -1.0F, 1.0F);
 
     glUniformMatrix4fv(glGetUniformLocation(m_shader->Program, "projection"), 1, GL_FALSE, glm::value_ptr(projection1));
     

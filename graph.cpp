@@ -6,6 +6,7 @@ m_verts(0)
 {
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, & m_vbo);
+	
 }
 
 void Graph::buffer(){
@@ -52,8 +53,12 @@ void Graph::buffer(){
 	glBindVertexArray(0);
 }
 
-void Graph::draw(){
+void Graph::draw(const float offset){
 	m_shader->use();
+	glm::mat4 model;
+	model = glm::translate(model, glm::vec3(-offset,0.0f,0.0f));
+	glUniformMatrix4fv(glGetUniformLocation(m_shader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
+	
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_LINES, 0, m_verts);
 	glBindVertexArray(0);

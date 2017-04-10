@@ -5,7 +5,9 @@
 #include <GLFW/glfw3.h>
 #include "shader.h"
 #include "glm/glm.hpp"
-
+#include "glm/ext.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "window.h"
 struct Line
 {
 	Line(glm::vec2 p1, glm::vec2 p2) : m_p1(p1), m_p2(p2){}
@@ -46,7 +48,7 @@ class Graph{
 					m_functions[i].m_lines.push_back(line);
 		}
 
-		void draw();
+		void draw(const float offset);
 		void buffer();
 
 	private:

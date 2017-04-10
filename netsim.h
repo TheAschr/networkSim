@@ -18,7 +18,7 @@
 
 #include "glm/ext.hpp"
 #include "text.h"
-
+#include "colors.h"
 #include "graph.h"
 
 enum class MODES { SIM , GRAPH };

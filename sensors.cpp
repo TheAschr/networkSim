@@ -9,12 +9,12 @@ m_numSens(numSensors),
 m_sensRad(sensRad),
 m_active(numSensors),
 m_optTimes(0),
-alive(0,glm::vec3(1.0f,0.0f,0.0f)),
-grid(1,glm::vec3(1.0f,1.0f,1.0f)),
-active(2,glm::vec3(0.0f,0.0f,1.0f)),
-coverage(3,glm::vec3(0.0f,1.0f,0.0f)),
+alive(0,COLORS::RED),
+grid(1,COLORS::WHITE),
+active(2,COLORS::BLUE),
+coverage(3,COLORS::GREEN),
 v(glm::vec2(0.0f,1.0f),glm::vec2(0.0f,-1.0f)),
-h(glm::vec2(-1.0f,0.0f),glm::vec2(1.0f,0.0f))
+h(glm::vec2(-1.0f,0.0f),glm::vec2(10.0f,0.0f))
 {}
 
 void Sensors::build(std::vector<Sensor*> sensors,const SENSOR::ALGORITHMS algorithm){
@@ -60,11 +60,11 @@ void Sensors::setIntersects(){
 	}
 }
 
-void Sensors::drawGLuints(){
+void Sensors::drawIntersects(){
 	for(GLuint i = 0; i < m_sensors.size();i++){
 		for(GLuint j =0; j < m_sensors[i]->m_intersections.size();j++){
 			Circle temp(m_sensors[i]->m_intersections[j],INTERSECTIONS::DEFAULT_RAD,INTERSECTIONS::DEFAULT_PRECISION);
-			temp.draw(*m_shader,glm::vec4(1.0f,1.0f,1.0f,0.3f));
+			temp.draw(*m_shader,glm::vec4(COLORS::WHITE,0.3f));
 		}
 	}
 }

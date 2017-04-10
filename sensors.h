@@ -9,6 +9,8 @@
 #include "window.h"
 #include <iomanip>
 #include "graph.h"
+#include <algorithm>
+#include "colors.h"
 
 namespace SENSOR{
 	const GLuint DEFAULT_ENERGY = 300;
@@ -68,8 +70,8 @@ class Sensors{
 			m_sensors.clear();
 		}
 		void draw();
-		void drawGLuints();
-		void drawGraph(){m_graph.draw();}
+		void drawIntersects();
+		void drawGraph(){m_graph.draw(m_optTimes*0.01f);}
 
 		void build(std::vector<Sensor*> sensors,const SENSOR::ALGORITHMS algorithm);
 		
