@@ -21,27 +21,27 @@
 
 #include "graph.h"
 
-enum class Modes { SIM , GRAPH };
+enum class MODES { SIM , GRAPH };
 
 class NetSim{
 	public:
-		NetSim(GLFWwindow* window,const int numSensors);
-		~NetSim(){
-		}
+		NetSim(GLFWwindow* window,const GLuint numSensors);
+
 		void run();
 
 	private:
+		
 		GLFWwindow* m_window;
 
 		bool m_running;
-		bool m_rebuild;
-		bool m_nextPeriod;
+
 		void input();
 		void redraw();
 		void rebuildSensors();
+	
 		std::vector<Sensors> m_sensors;
-		int m_curSensors;
-		//std::vector<Sensors*> m_states;
+	
+		SENSOR::ALGORITHMS m_curSensors;
 
 		Text m_textEngine;
 
@@ -49,8 +49,8 @@ class NetSim{
 		Shader m_textShader;
 		Shader m_graphShader;
 
-		int m_numSensors;
-		Modes m_mode;
+		GLuint m_numSensors;
+		MODES m_mode;
 
 };
 

@@ -1,27 +1,24 @@
-//
-//  main.cpp
-//
-//  Created by Alex Schrimpf on 2/12/17.
-//  Copyright © 2017 Alex Schrimpf. All rights reserved.
-//
-
 #include <iostream>
-
 #define GLEW_STATIC
 #include <GL/glew.h>
-
 #include <GLFW/glfw3.h>
-
 #include "window.h"
 #include "netsim.h"
 
-int NUM_SENSORS = 300;
-
 int main(int argc, const char * argv[]) {
-    srand(time(NULL));
-    GLFWwindow* window = WINDOW::initWindow("Network Simulator");
-    NetSim network(window,NUM_SENSORS);
-    network.run();
-    glfwTerminate();
+	
+	if(argv[1]){
+		srand(time(NULL));
+   		
+   		GLFWwindow* window = WINDOW::initWindow("Network Simulator");
+    	NetSim network(window,atoi(argv[1]));
+    	
+    	network.run();
+    	
+    	glfwTerminate();
+	}
+	else
+		printf("Enter a number as an argument\n");
+    
     return 0;
 }

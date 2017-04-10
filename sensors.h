@@ -11,13 +11,20 @@
 #include "graph.h"
 
 namespace SENSOR{
-	const int DEFAULT_ENERGY = 300;
-	const int DEFAULT_ENERGY_LOSS = 10;
-	const int DEFAULT_PRECISION = 8;
+	const GLuint DEFAULT_ENERGY = 300;
+	const GLuint DEFAULT_ENERGY_LOSS = 10;
+	const GLuint DEFAULT_PRECISION = 8;
+	const GLfloat DEFAULT_RADIUS_LOWER = 5.0f;
+	const GLfloat DEFAULT_RADIUS_UPPER = 5.0f;
+	const GLfloat DEFAULT_COLOR_LOWER = 0.0f;
+	const GLfloat DEFAULT_COLOR_UPPER = 1.0f;
+
+	const glm::vec2 NORMALIZED_VECS(-1.0f,1.0f);
 	const glm::vec3  COLORS[3] = {glm::vec3(1.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f),glm::vec3(0.0f,0.0f,1.0f) };
+	enum class ALGORITHMS { RAND_BOT_UP, RAND_TOP_DOWN, ALL_ACTIVE, WEIGHTED_BOT_UP, SIZE = int(WEIGHTED_BOT_UP) };
 }
 namespace INTERSECTIONS{
-	const int DEFAULT_PRECISION = 7;
+	const GLuint DEFAULT_PRECISION = 7;
 	const GLfloat DEFAULT_RAD = 0.005f;
 }
 struct Sensor
@@ -30,27 +37,22 @@ struct Sensor
 		m_color(color),
 		m_circle(position,radius,SENSOR::DEFAULT_PRECISION),
 		active(true){}
+
 	void draw(Shader& shader){
-		//m_circle.draw(glm::vec4( glm::vec3(sin(glfwGetTime()*m_color.x)/2+0.5,sin(glfwGetTime()*m_color.y)/2+0.5,sin(glfwGetTime()*m_color.z)/2+0.5),(float)m_energy/SENSOR::DEFAULT_ENERGY));
 		if(active)
 			m_circle.draw(shader,glm::vec4(SENSOR::COLORS[1],(float)m_energy/SENSOR::DEFAULT_ENERGY));
-			//m_circle.draw(glm::vec4( glm::vec3(sin(glfwGetTime()*m_color.x)/2+0.5,sin(glfwGetTime()*m_color.y)/2+0.5,sin(glfwGetTime()*m_color.z)/2+0.5),(float)m_energy/SENSOR::DEFAULT_ENERGY));
 		else
 			m_circle.draw(shader,glm::vec4(SENSOR::COLORS[0],(float)m_energy/SENSOR::DEFAULT_ENERGY));
-			//m_circle.draw(glm::vec4(SENSOR::COLORS[0],sin(glfwGetTime()*6)/2+0.5));
-
 	}
 
-	void setInts(Sensor& sensor){
-		std::vector<glm::vec2> temp(m_circle.getInts(sensor.m_circle));
-		//for(int i = 0; i < temp.size();i++)
-	//		std::cout << "Intercepts: " << temp[i].x << " " << temp[i].y << std::endl;
+	void setIntersects(Sensor& sensor){
+		std::vector<glm::vec2> temp(m_circle.getIntersects(sensor.m_circle));
 		m_intersections.insert(m_intersections.end(),temp.begin(),temp.end());
 	}
 
 	bool active;
 	GLfloat m_radius;
-	int m_energy;
+	GLuint m_energy;
 	glm::vec3 m_color;
 	glm::vec2 m_position;
 
@@ -61,47 +63,49 @@ struct Sensor
 
 class Sensors{
 	public:
-		Sensors(Shader& shader,Shader& gShader,const int numSensors,const int sensRad);
-		//Sensors(Sensors& sensors);
-		~Sensors(){
-			//m_sensors.clear();
+		Sensors(Shader& shader,Shader& gShader,const GLuint numSensors,const GLuint sensRad);
+		virtual ~Sensors(){
+			m_sensors.clear();
 		}
 		void draw();
-		void drawInts();
-		void drawGraph(){m_graph.draw();m_graph.buffer();}
+		void drawGLuints();
+		void drawGraph(){m_graph.draw();}
 
-		void build(std::vector<Sensor*> sensors,int algorithm);
+		void build(std::vector<Sensor*> sensors,const SENSOR::ALGORITHMS algorithm);
 		
-		int getInts() const {return m_intersections;}	
-		int getAlive() const {return m_sensors.size();}
-		int getActive() const {return m_active;}
-		int getOptTimes() const {return m_optTimes;}
-		//std::vector<Sensors*> getSensors()const{return m_sensors;}
-		void optimize() ;
-		float getCoverage(){return m_coverage;}
-		void setCoverage(const int precision);
+		GLuint getIntersects() const {return m_intersections;}	
+		GLuint getAlive() const {return m_sensors.size();}
+		GLuint getActive() const {return m_active;}
+		GLuint getOptTimes() const {return m_optTimes;}
 
-		int m_algorithm;
+		void optimize();
+		float getCoverage(){return m_coverage;}
+		void setCoverage(const GLuint precision);
+
+		SENSOR::ALGORITHMS m_algorithm;
 	private:
 
 		bool redundant(Sensor* sensor);
-		void setInts();
-		void setActive();
+	
 		void randTopDown();
 		void randBotUp();
 		void allActive();
 		void weightedBotUp();
+	
 		bool setPower();
+		void setIntersects();
+		void setActive();
 
-		int nonCoveredPoints(Sensor *s0);
+		GLuint nonCoveredPoints(Sensor *s0);
 
 		Shader* m_shader;
-		int m_sensRad;
+		GLuint m_sensRad;
 		std::vector<Sensor*> m_sensors;
-		int m_intersections;
-		int m_active;
-		int m_numSens;
-		int m_optTimes;
+		
+		GLuint m_intersections;
+		GLuint m_active;
+		GLuint m_numSens;
+		GLuint m_optTimes;
 
 		float m_coverage;
 

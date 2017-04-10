@@ -1,17 +1,14 @@
 #include "circle.h"
 
-Circle::Circle(const glm::vec2& position,const GLfloat radius,const int precision) : m_position(position), m_radius(radius){
+Circle::Circle(const glm::vec2& position,const GLfloat radius,const GLuint precision) : m_position(position), m_radius(radius){
 
 	std::vector<GLfloat> result;
 	float increment = 2.0f * PI / (pow(10,precision)/(WINDOW::SCREEN_W*WINDOW::SCREEN_H));
 
 	m_verts = 0;
-	for (float currAngle = 0.0f; currAngle <= 2.0f * PI; currAngle += increment)
-	{
+	for (float currAngle = 0.0f; currAngle <= 2.0f * PI; currAngle += increment){
 	    result.push_back((radius * cos(currAngle)) + m_position.x);
-	    //std::cout << "Current Angle: "<<  currAngle << std::endl << " " << radius * cos(currAngle) + m_position.x;
 	    result.push_back((radius * sin(currAngle)) + m_position.y);
-	    //std::cout << " " << radius * sin(currAngle) +m_position.y <<std::endl;
 		m_verts++;
 	}
 
@@ -42,7 +39,7 @@ void Circle::draw(Shader& shader,const glm::vec4& color)
 }
 
 
-std::vector<glm::vec2> Circle::getInts(const Circle& circle) const{
+std::vector<glm::vec2> Circle::getIntersects(const Circle& circle) const{
 	
 	std::vector<glm::vec2> temp;
 
@@ -56,11 +53,11 @@ std::vector<glm::vec2> Circle::getInts(const Circle& circle) const{
 
 		glm::vec2 p2(m_position.x + a*(p1.x-m_position.x)/d,m_position.y + a*(p1.y-m_position.y)/d);
 
-		glm::vec2 int1(p2.x+h*(p1.y - m_position.y)/d,p2.y-h*(p1.x-m_position.x)/d);
-		glm::vec2 int2(p2.x-h*(p1.y-m_position.y)/d,p2.y+h*(p1.x-m_position.x)/d);
+		glm::vec2 i1(p2.x+h*(p1.y - m_position.y)/d,p2.y-h*(p1.x-m_position.x)/d);
+		glm::vec2 i2(p2.x-h*(p1.y-m_position.y)/d,p2.y+h*(p1.x-m_position.x)/d);
 
-		temp.push_back(int1);
-		temp.push_back(int2);
+		temp.push_back(i1);
+		temp.push_back(i2);
 	}
 	return temp;
 

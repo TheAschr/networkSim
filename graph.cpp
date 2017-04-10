@@ -1,40 +1,18 @@
 #include "graph.h"
 
 Graph::Graph(Shader& shader):
-m_shader(&shader)
+m_shader(&shader),
+m_verts(0)
 {
-
-	// glGenVertexArrays(1, &m_vao);
-	// glGenBuffers(1, &m_vbo);
-
-	// glBindVertexArray(m_vao);
-
-	// glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	// //glBufferData(GL_ARRAY_BUFFER,m_buffer.size() * sizeof(GLfloat), &m_buffer[0], GL_STATIC_DRAW);
-
-	// glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
-	// glEnableVertexAttribArray(0);
-
-	// glBindBuffer(GL_ARRAY_BUFFER, 0); 
-
-	// glBindVertexArray(0);
-
 	glGenVertexArrays(1, &m_vao);
 	glGenBuffers(1, & m_vbo);
-	//glBindVertexArray(m_vao);
-
-	//glBindBuffer(GL_ARRAY_BUFFER,0);
-	//glBindVertexArray(0);
-
-	m_verts =0;
-
 }
 
 void Graph::buffer(){
 	m_buffer.clear();
 	m_verts = 0;
-	for(int i = 0; i < m_functions.size();i++){
-		for(int j= 0; j < m_functions[i].m_lines.size();j++){
+	for(GLuint i = 0; i < m_functions.size();i++){
+		for(GLuint j= 0; j < m_functions[i].m_lines.size();j++){
 			m_buffer.push_back(m_functions[i].m_lines[j].m_p1.x);
 			m_buffer.push_back(m_functions[i].m_lines[j].m_p1.y);
 
@@ -58,10 +36,6 @@ void Graph::buffer(){
 
 	}
 
-
-	//glGenVertexArrays(1, &m_vao);
-	//glGenBuffers(1, &m_vbo);
-
 	glBindVertexArray(m_vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -73,21 +47,15 @@ void Graph::buffer(){
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(2*sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
 
-
 	glBindBuffer(GL_ARRAY_BUFFER, 0); 
 
 	glBindVertexArray(0);
 }
 
 void Graph::draw(){
-
-
-	//std::cout << m_buffer.size() << std::endl;
-
-	m_shader->Use();
+	m_shader->use();
 	glBindVertexArray(m_vao);
 	glDrawArrays(GL_LINES, 0, m_verts);
-	//std::cout << "Test" << std::endl;
 	glBindVertexArray(0);
 
 }

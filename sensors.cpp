@@ -1,6 +1,6 @@
 #include "sensors.h"
 
-Sensors::Sensors(Shader& shader,Shader& gShader,const int numSensors,const int sensRad):
+Sensors::Sensors(Shader& shader,Shader& gShader,const GLuint numSensors,const GLuint sensRad):
 m_intersections(0),
 m_shader(&shader),
 m_graphShader(&gShader),
@@ -15,13 +15,9 @@ active(2,glm::vec3(0.0f,0.0f,1.0f)),
 coverage(3,glm::vec3(0.0f,1.0f,0.0f)),
 v(glm::vec2(0.0f,1.0f),glm::vec2(0.0f,-1.0f)),
 h(glm::vec2(-1.0f,0.0f),glm::vec2(1.0f,0.0f))
-{
+{}
 
-
-
-}
-
-void Sensors::build(std::vector<Sensor*> sensors,int algorithm){
+void Sensors::build(std::vector<Sensor*> sensors,const SENSOR::ALGORITHMS algorithm){
 
 	m_optTimes = 0;
 	m_sensors.clear();
@@ -29,11 +25,11 @@ void Sensors::build(std::vector<Sensor*> sensors,int algorithm){
 	m_algorithm = algorithm;
 
 	m_sensors = sensors;
-	setInts();
+	setIntersects();
 	setActive();
 	setCoverage(10000);
 
-	for(int i =0; i < 4;i++)
+	for(GLuint i =0; i < 4;i++)
 		m_graph.resetFunction(i);
 	
 	m_graph.addFunction(alive);
@@ -45,33 +41,28 @@ void Sensors::build(std::vector<Sensor*> sensors,int algorithm){
 	m_graph.addLine(v,1);
 	m_graph.buffer();
 
-
-
-
-
 }
 
 void Sensors::draw(){
-	for(int i = 0; i < m_sensors.size();i++)
+	for(GLuint i = 0; i < m_sensors.size();i++)
 		m_sensors[i]->draw(*m_shader);
-	
 }
 
-void Sensors::setInts(){
+void Sensors::setIntersects(){
 	m_intersections = 0;
-	for(int i = 0; i < m_sensors.size();i++){
+	for(GLuint i = 0; i < m_sensors.size();i++){
 		m_sensors[i]->m_intersections.clear();
 
-		for(int j = 0; j < m_sensors.size();j++)
-			m_sensors[i]->setInts(*m_sensors[j]);
+		for(GLuint j = 0; j < m_sensors.size();j++)
+			m_sensors[i]->setIntersects(*m_sensors[j]);
 
 		m_intersections+=m_sensors[i]->m_intersections.size();
 	}
 }
 
-void Sensors::drawInts(){
-	for(int i = 0; i < m_sensors.size();i++){
-		for(int j =0; j < m_sensors[i]->m_intersections.size();j++){
+void Sensors::drawGLuints(){
+	for(GLuint i = 0; i < m_sensors.size();i++){
+		for(GLuint j =0; j < m_sensors[i]->m_intersections.size();j++){
 			Circle temp(m_sensors[i]->m_intersections[j],INTERSECTIONS::DEFAULT_RAD,INTERSECTIONS::DEFAULT_PRECISION);
 			temp.draw(*m_shader,glm::vec4(1.0f,1.0f,1.0f,0.3f));
 		}
@@ -82,8 +73,8 @@ void Sensors::drawInts(){
 bool Sensors::redundant(Sensor *s0){
 	GLfloat distance;
 	bool contains;
-	int s1;
-	for (int i = 0; i < s0->m_intersections.size();i++){
+	GLuint s1;
+	for (GLuint i = 0; i < s0->m_intersections.size();i++){
 		contains = false;
 		s1 = 0;
 		do{
@@ -106,11 +97,11 @@ bool Sensors::redundant(Sensor *s0){
 
 }
 
-int Sensors::nonCoveredPoints(Sensor *s0){
-	int p = s0->m_intersections.size();
-	for(int i = 0; i < s0->m_intersections.size();i++){
+GLuint Sensors::nonCoveredPoints(Sensor *s0){
+	GLuint p = s0->m_intersections.size();
+	for(GLuint i = 0; i < s0->m_intersections.size();i++){
 		bool contains = false;
-		int s1 = 0;
+		GLuint s1 = 0;
 		while(s1 < m_sensors.size()){
 			GLfloat distance = std::abs( sqrt( pow(m_sensors[s1]->m_position.x - s0->m_intersections[i].x,2) + pow(m_sensors[s1]->m_position.y - s0->m_intersections[i].y, 2) ) );
 			if(distance + pow(10,-6) < m_sensors[s1]->m_radius)
@@ -124,17 +115,18 @@ int Sensors::nonCoveredPoints(Sensor *s0){
 }
 
 
-void Sensors::setCoverage(const int precision){
+void Sensors::setCoverage(const GLuint precision){
+	
 	std::random_device rd;  
 	std::mt19937 gen(rd());
 	std::uniform_real_distribution<GLfloat> rPos(-1.0,1.0);
 	
-	int p = 0;
+	GLuint p = 0;
 
-	for(int i = 0; i < precision; i++){
+	for(GLuint i = 0; i < precision; i++){
 			glm::vec2 position = glm::vec2(rPos(gen),rPos(gen));
 			bool contains = false;
-			int s1 = 0;
+			GLuint s1 = 0;
 			while(s1 < m_sensors.size() && !contains){
 				GLfloat distance = std::abs( sqrt( pow(m_sensors[s1]->m_position.x - position.x,2) + pow(m_sensors[s1]->m_position.y - position.y, 2) ) );
 				if(distance + pow(10,-6) < m_sensors[s1]->m_radius && m_sensors[s1]->active)
@@ -149,7 +141,7 @@ void Sensors::setCoverage(const int precision){
 
 void Sensors::allActive(){
 	m_active = m_sensors.size();
-	for(int i = 0; i < m_sensors.size();i++)
+	for(GLuint i = 0; i < m_sensors.size();i++)
 		m_sensors[i]->active = true;
 }
 
@@ -158,7 +150,7 @@ void Sensors::randBotUp(){
 	std::random_shuffle (m_sensors.begin(), m_sensors.end());
 
 	m_active = 0;
-	for(int i = 0; i < m_sensors.size();i++){
+	for(GLuint i = 0; i < m_sensors.size();i++){
 		if(!redundant(m_sensors[i])){
 			m_sensors[i]->active = true;
 			m_active++;
@@ -169,10 +161,11 @@ void Sensors::randBotUp(){
 }
 
 void Sensors::randTopDown(){
+	
 	std::random_shuffle (m_sensors.begin(), m_sensors.end());
 
 	m_active = m_sensors.size();
-	for(int i = 0; i < m_sensors.size();i++){
+	for(GLuint i = 0; i < m_sensors.size();i++){
 		if(redundant(m_sensors[i])){
 			m_sensors[i]->active = false;
 			m_active--;
@@ -183,15 +176,18 @@ void Sensors::randTopDown(){
 }
 
 void Sensors::weightedBotUp(){
+	
 	std::vector<std::pair<int, int> > temp;
 	m_active = 0;
+	
 	for(int i = 0; i < m_sensors.size();i++){
-		int p = nonCoveredPoints(m_sensors[i]);
+		GLuint p = nonCoveredPoints(m_sensors[i]);
 		temp.push_back(std::make_pair(i,p));
 	}
+	
 	std::sort(temp.begin(),temp.end(),[](auto &left, auto &right){return left.second > right.second;});
 
-	for(int i = 0; i < temp.size();i++){
+	for(GLuint i = 0; i < temp.size();i++){
 		if(!redundant(m_sensors[temp[i].first])){
 			m_sensors[temp[i].first]->active = true;
 			m_active++;
@@ -199,13 +195,16 @@ void Sensors::weightedBotUp(){
 		else
 			m_sensors[temp[i].first]->active = false;
 	}
+
 }
 
 
 bool Sensors::setPower(){
+
 	std::vector<Sensor*> temp;
 	bool died = false;
-	for(int i = 0; i < m_sensors.size();i++){
+	
+	for(GLuint i = 0; i < m_sensors.size();i++){
 		if(m_sensors[i]->m_energy>0)
 			temp.push_back(m_sensors[i]);
 		else
@@ -214,43 +213,40 @@ bool Sensors::setPower(){
 			m_sensors[i]->m_energy-=SENSOR::DEFAULT_ENERGY_LOSS;
 	}
 	m_sensors = temp;
+
 	return died;
 }
 
 void Sensors::setActive(){
-	for(int i = 0; i< m_sensors.size();i++)
+	for(GLuint i = 0; i< m_sensors.size();i++)
 		m_sensors[i]->active =false;
-		switch(m_algorithm){
-			case 0:
+	switch(m_algorithm){
+		case SENSOR::ALGORITHMS::RAND_BOT_UP:
 			randBotUp();
-			break;
-			case 1:
+		break;
+		case SENSOR::ALGORITHMS::RAND_TOP_DOWN:
 			randTopDown();
-			break;
-			case 2:
+		break;
+		case SENSOR::ALGORITHMS::ALL_ACTIVE:
 			allActive();
-			break;
-			case 3:
+		break;
+		case SENSOR::ALGORITHMS::WEIGHTED_BOT_UP:
 			weightedBotUp();
-			break;
-		}
+		break;
+	}
 }
 
-void Sensors::optimize() {
+void Sensors::optimize(){
+	
 	glm::vec2 lastAlive((float)m_optTimes*0.01f,(float)(getAlive())/(float)m_numSens);
 	glm::vec2 lastActive((float)m_optTimes*0.01f,(float)(getActive())/(float)m_numSens);
 	glm::vec2 lastCov((float)m_optTimes*0.01f,getCoverage());
 
 	m_optTimes++;
-	if(setPower()){
-		setInts();
-		setActive();
-		setCoverage(10000);
-	}
-	// setPower();
-	// setInts();
-	// setActive();
-	// setCoverage(10000);
+	if(setPower())
+		setIntersects();
+	setActive();
+	setCoverage(10000);
 	
 	glm::vec2 currAlive((float)m_optTimes*0.01f,(float)(getAlive())/(float)m_numSens);
 	glm::vec2 currActive((float)m_optTimes*0.01f,(float)(getActive())/(float)m_numSens);
@@ -259,7 +255,7 @@ void Sensors::optimize() {
 	Line aliveL(currAlive,lastAlive);
 	Line activeL(currActive,lastActive);
 	Line covL(currCov,lastCov);
-	//std::cout << "(" << lastAlive.x  << "," << lastAlive.y << ")" << " to " << "(" << currAlive.x << "," << currAlive.y << ")" << std::endl;
+
 	m_graph.addLine(aliveL,0);
 	m_graph.addLine(activeL,2);
 	m_graph.addLine(covL,3);

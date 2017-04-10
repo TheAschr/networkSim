@@ -24,7 +24,7 @@ const GLfloat PI = 3.14159265358979f;
 
 class Circle{
 public:
-    Circle(const glm::vec2& position,const GLfloat radius,const int precision);
+    Circle(const glm::vec2& position,const GLfloat radius,const GLuint precision);
     ~Circle(){
         glDeleteVertexArrays(1, &m_vao);
         glDeleteBuffers(1, &m_vbo);
@@ -35,7 +35,7 @@ public:
     glm::vec2 getPos() const {return m_position;}
     GLfloat getRad() const {return m_radius;}
 
-    std::vector<glm::vec2> getInts(const Circle& circle) const ;
+    std::vector<glm::vec2> getIntersects(const Circle& circle) const ;
 
 private: 
     glm::vec2 m_position;
