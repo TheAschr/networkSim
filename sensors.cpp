@@ -13,7 +13,8 @@ alive(0,COLORS::RED),
 grid(1,COLORS::WHITE),
 active(2,COLORS::BLUE),
 coverage(3,COLORS::GREEN),
-v(glm::vec2(0.0f,1.0f),glm::vec2(0.0f,-1.0f)),
+energy(4,COLORS::YELLOW),
+v(glm::vec2(0.0f,10.0f),glm::vec2(0.0f,-1.0f)),
 h(glm::vec2(-1.0f,0.0f),glm::vec2(100.0f,0.0f))
 {}
 
@@ -29,13 +30,14 @@ void Sensors::build(std::vector<Sensor*> sensors,const SENSOR::ALGORITHMS algori
 	setActive();
 	setCoverage(10000);
 
-	for(GLuint i =0; i < 4;i++)
+	for(GLuint i =0; i < 5;i++)
 		m_graph.resetFunction(i);
 	
 	m_graph.addFunction(alive);
 	m_graph.addFunction(grid);
 	m_graph.addFunction(active);
 	m_graph.addFunction(coverage);
+	m_graph.addFunction(energy);
 
 	m_graph.addLine(h,1);
 	m_graph.addLine(v,1);
@@ -211,6 +213,7 @@ bool Sensors::setPower(){
 			died = true;
 		if(m_sensors[i]->active)
 			m_sensors[i]->m_energy-=SENSOR::DEFAULT_ENERGY_LOSS;
+		
 	}
 	m_sensors = temp;
 
@@ -238,27 +241,33 @@ void Sensors::setActive(){
 
 void Sensors::optimize(){
 	
-	glm::vec2 lastAlive((float)m_optTimes * 0.01f,(float)(getAlive())/(float)m_numSens);
-	glm::vec2 lastActive((float)m_optTimes * 0.01f,(float)(getActive())/(float)m_numSens);
-	glm::vec2 lastCov((float)m_optTimes * 0.01f,getCoverage());
+	glm::vec2 lastAlive((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,(float)(getAlive())/(float)m_numSens);
+	glm::vec2 lastActive((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,(float)(getActive())/(float)m_numSens);
+	glm::vec2 lastCov((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,getCoverage());
+	glm::vec2 lastEnergy((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,getEnergy()/SENSOR::DEFAULT_ENERGY);
 
 	m_optTimes++;
 	if(setPower())
 		setIntersects();
 	setActive();
 	setCoverage(10000);
+
 	
-	glm::vec2 currAlive((float)m_optTimes * 0.01f,(float)(getAlive())/(float)m_numSens);
-	glm::vec2 currActive((float)m_optTimes * 0.01f,(float)(getActive())/(float)m_numSens);
-	glm::vec2 currCov((float)m_optTimes * 0.01f,getCoverage());
+	glm::vec2 currAlive((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,(float)(getAlive())/(float)m_numSens);
+	glm::vec2 currActive((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,(float)(getActive())/(float)m_numSens);
+	glm::vec2 currCov((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,getCoverage());
+	glm::vec2 currEnergy((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,getEnergy()/SENSOR::DEFAULT_ENERGY);
+
 
 	Line aliveL(currAlive,lastAlive);
 	Line activeL(currActive,lastActive);
 	Line covL(currCov,lastCov);
+	Line energyL(currEnergy,lastEnergy);
 
 	m_graph.addLine(aliveL,0);
 	m_graph.addLine(activeL,2);
 	m_graph.addLine(covL,3);
+	m_graph.addLine(energyL,4);
 
 	m_graph.buffer();
 }

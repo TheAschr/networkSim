@@ -56,7 +56,7 @@ void Graph::buffer(){
 void Graph::draw(const float offset){
 	m_shader->use();
 	glm::mat4 model;
-	model = glm::translate(model, glm::vec3(-offset,0.0f,0.0f));
+	model = glm::translate(model, glm::vec3(-offset,-0.3f,0.0f));
 	glUniformMatrix4fv(glGetUniformLocation(m_shader->Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 	
 	glBindVertexArray(m_vao);

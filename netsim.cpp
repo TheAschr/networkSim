@@ -63,15 +63,27 @@ void NetSim::redraw(){
 	alive << std::fixed << std::setprecision(1) << (double)m_sensors[(int)m_curSensors].getAlive()/m_numSensors *100;
 	std::stringstream active;
 	active << std::fixed << std::setprecision(1) << (double)m_sensors[(int)m_curSensors].getActive()/m_numSensors *100;
-		std::stringstream coverage;
+	std::stringstream coverage;
 	coverage << std::fixed << std::setprecision(1) << (double)m_sensors[(int)m_curSensors].getCoverage() *100;
-	m_textEngine.render("Algorithm: " + std::to_string(1+(int)m_sensors[(int)m_curSensors].m_algorithm) +
-		" Alive: " + alive.str() + 
-		"\% Active: " + active.str() +  
-		"\% Intersections: " + std::to_string(m_sensors[(int)m_curSensors].getIntersects()) + 
-		" Coverage: " + coverage.str() + 
-		"\% Period: " + std::to_string(m_sensors[(int)m_curSensors].getOptTimes()) 
-		, 10.0f, 10.0f, (float)WINDOW::SCREEN_W * 0.0005f, COLORS::WHITE);
+	std::stringstream energy;
+	energy << std::fixed << std::setprecision(1) << m_sensors[(int)m_curSensors].getEnergy();
+	
+	m_textEngine.render("Algorithm: " + std::to_string(1+(int)m_sensors[(int)m_curSensors].m_algorithm),0*((float)WINDOW::SCREEN_W/7.0f - (float)WINDOW::SCREEN_W * 0.0008f),0.0f,(float)WINDOW::SCREEN_W * 0.0003f, COLORS::WHITE);
+	m_textEngine.render("Period: " + std::to_string(m_sensors[(int)m_curSensors].getOptTimes()),1*((float)WINDOW::SCREEN_W/7.0f - (float)WINDOW::SCREEN_W * 0.0008f),0.0f,(float)WINDOW::SCREEN_W * 0.0003f, COLORS::WHITE);
+	m_textEngine.render("Intersections: " + std::to_string(m_sensors[(int)m_curSensors].getIntersects()),2*((float)WINDOW::SCREEN_W/7.0f - (float)WINDOW::SCREEN_W * 0.0008f),0.0f,(float)WINDOW::SCREEN_W * 0.0003f, COLORS::WHITE);
+	m_textEngine.render("Active: " + active.str() + "\%",3*((float)WINDOW::SCREEN_W/7.0f - (float)WINDOW::SCREEN_W * 0.0008f),0.0f,(float)WINDOW::SCREEN_W * 0.0003f, COLORS::BLUE);
+	m_textEngine.render("Alive: " + alive.str() + "\%",4*((float)WINDOW::SCREEN_W/7.0f - (float)WINDOW::SCREEN_W * 0.0008f),0.0f,(float)WINDOW::SCREEN_W * 0.0003f, COLORS::RED);
+	m_textEngine.render("Coverage: " + coverage.str() + "\%",5*((float)WINDOW::SCREEN_W/7.0f - (float)WINDOW::SCREEN_W * 0.0008f),0.0f,(float)WINDOW::SCREEN_W * 0.0003f, COLORS::GREEN);
+	m_textEngine.render("Average Energy: " + energy.str(),6*((float)WINDOW::SCREEN_W/7.0f - (float)WINDOW::SCREEN_W * 0.0008f),0.0f,(float)WINDOW::SCREEN_W * 0.0003f, COLORS::YELLOW);
+
+	// m_textEngine.render("Algorithm: " + std::to_string(1+(int)m_sensors[(int)m_curSensors].m_algorithm) +
+	// 	" Alive: " + alive.str() + 
+	// 	"\% Active: " + active.str() +  
+	// 	"\% Intersections: " + std::to_string(m_sensors[(int)m_curSensors].getIntersects()) + 
+	// 	" Coverage: " + coverage.str() + 
+	// 	"\% Period: " + std::to_string(m_sensors[(int)m_curSensors].getOptTimes()) + 
+	// 	" Average Energy: " + energy.str()
+	// 	, 10.0f, 10.0f, (float)WINDOW::SCREEN_W * 0.0003f, COLORS::WHITE);
 	glfwSwapBuffers(m_window);
 }
 

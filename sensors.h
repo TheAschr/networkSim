@@ -21,6 +21,8 @@ namespace SENSOR{
 	const GLfloat DEFAULT_COLOR_LOWER = 0.0f;
 	const GLfloat DEFAULT_COLOR_UPPER = 1.0f;
 
+	//lower is faster
+	const GLfloat DEFAULT_GRAPH_SPEED = 0.005f;
 	const glm::vec2 NORMALIZED_VECS(-1.0f,1.0f);
 	const glm::vec3  COLORS[3] = {glm::vec3(1.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f),glm::vec3(0.0f,0.0f,1.0f) };
 	enum class ALGORITHMS { RAND_BOT_UP, RAND_TOP_DOWN, ALL_ACTIVE, WEIGHTED_BOT_UP, SIZE = int(WEIGHTED_BOT_UP) };
@@ -71,7 +73,7 @@ class Sensors{
 		}
 		void draw();
 		void drawIntersects();
-		void drawGraph(){m_graph.draw(m_optTimes*0.01f);}
+		void drawGraph(){m_graph.draw(m_optTimes*(float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED);}
 
 		void build(std::vector<Sensor*> sensors,const SENSOR::ALGORITHMS algorithm);
 		
@@ -79,6 +81,15 @@ class Sensors{
 		GLuint getAlive() const {return m_sensors.size();}
 		GLuint getActive() const {return m_active;}
 		GLuint getOptTimes() const {return m_optTimes;}
+
+		GLfloat getEnergy(){
+			GLfloat e = 0;
+
+			for(int i =0; i < m_sensors.size();i++)
+				e+=m_sensors[i]->m_energy;
+
+			return (e/m_sensors.size());
+		}
 
 		void optimize();
 		float getCoverage(){return m_coverage;}
@@ -108,6 +119,7 @@ class Sensors{
 		GLuint m_active;
 		GLuint m_numSens;
 		GLuint m_optTimes;
+		float m_energy;
 
 		float m_coverage;
 
@@ -117,6 +129,7 @@ class Sensors{
 		Function grid;
 		Function active;
 		Function coverage;
+		Function energy;
 
 		Line v;
 		Line h;

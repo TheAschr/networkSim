@@ -21,8 +21,8 @@ GLFWwindow* WINDOW::initWindow(std::string name){
     glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
     glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 	
-    GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, name.c_str(), monitor, nullptr);
- //  GLFWwindow* window = glfwCreateWindow(SCREEN_W, SCREEN_H, name.c_str(), nullptr, nullptr);
+    //GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, name.c_str(), monitor, nullptr);
+    GLFWwindow* window = glfwCreateWindow(SCREEN_W, SCREEN_H, name.c_str(), nullptr, nullptr);
     glfwMakeContextCurrent(window);
     
     glewExperimental = GL_TRUE;

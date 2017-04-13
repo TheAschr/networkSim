@@ -4,7 +4,7 @@
 #include "glm/ext.hpp"
 
 namespace COLORS{
-	const extern glm::vec3 RED,GREEN,BLUE,WHITE;
+	const extern glm::vec3 RED,GREEN,BLUE,WHITE,YELLOW;
 }
 
 #endif
