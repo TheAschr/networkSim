@@ -21,8 +21,10 @@ namespace SENSOR{
 	const GLfloat DEFAULT_COLOR_LOWER = 0.0f;
 	const GLfloat DEFAULT_COLOR_UPPER = 1.0f;
 
-	//lower is faster
-	const GLfloat DEFAULT_GRAPH_SPEED = 0.005f;
+	const GLuint COVERAGE_PRECISION = 1000;
+
+	const GLfloat DEFAULT_GRAPH_SPEED = (float)DEFAULT_ENERGY_LOSS/DEFAULT_ENERGY;
+
 	const glm::vec2 NORMALIZED_VECS(-1.0f,1.0f);
 	const glm::vec3  COLORS[3] = {glm::vec3(1.0f,0.0f,0.0f),glm::vec3(0.0f,1.0f,0.0f),glm::vec3(0.0f,0.0f,1.0f) };
 	enum class ALGORITHMS { RAND_BOT_UP, RAND_TOP_DOWN, ALL_ACTIVE, WEIGHTED_BOT_UP, SIZE = int(WEIGHTED_BOT_UP) };
@@ -73,7 +75,7 @@ class Sensors{
 		}
 		void draw();
 		void drawIntersects();
-		void drawGraph(){m_graph.draw(m_optTimes*(float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED);}
+		void drawGraph(){m_graph.draw(m_optTimes*((float)1/SENSOR::DEFAULT_ENERGY_LOSS)*SENSOR::DEFAULT_GRAPH_SPEED);}
 
 		void build(std::vector<Sensor*> sensors,const SENSOR::ALGORITHMS algorithm);
 		

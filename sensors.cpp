@@ -241,22 +241,22 @@ void Sensors::setActive(){
 
 void Sensors::optimize(){
 	
-	glm::vec2 lastAlive((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,(float)(getAlive())/(float)m_numSens);
-	glm::vec2 lastActive((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,(float)(getActive())/(float)m_numSens);
-	glm::vec2 lastCov((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,getCoverage());
-	glm::vec2 lastEnergy((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,getEnergy()/SENSOR::DEFAULT_ENERGY);
+	glm::vec2 lastAlive((float)m_optTimes * ((float)1/SENSOR::DEFAULT_ENERGY_LOSS)*SENSOR::DEFAULT_GRAPH_SPEED,(float)(getAlive())/(float)m_numSens);
+	glm::vec2 lastActive((float)m_optTimes * ((float)1/SENSOR::DEFAULT_ENERGY_LOSS)*SENSOR::DEFAULT_GRAPH_SPEED,(float)(getActive())/(float)m_numSens);
+	glm::vec2 lastCov((float)m_optTimes * ((float)1/SENSOR::DEFAULT_ENERGY_LOSS)*SENSOR::DEFAULT_GRAPH_SPEED,getCoverage());
+	glm::vec2 lastEnergy((float)m_optTimes * ((float)1/SENSOR::DEFAULT_ENERGY_LOSS)*SENSOR::DEFAULT_GRAPH_SPEED,getEnergy()/SENSOR::DEFAULT_ENERGY);
 
 	m_optTimes++;
 	if(setPower())
 		setIntersects();
 	setActive();
-	setCoverage(10000);
+	setCoverage(SENSOR::COVERAGE_PRECISION);
 
 	
-	glm::vec2 currAlive((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,(float)(getAlive())/(float)m_numSens);
-	glm::vec2 currActive((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,(float)(getActive())/(float)m_numSens);
-	glm::vec2 currCov((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,getCoverage());
-	glm::vec2 currEnergy((float)m_optTimes * (float)SENSOR::DEFAULT_ENERGY_LOSS*SENSOR::DEFAULT_GRAPH_SPEED,getEnergy()/SENSOR::DEFAULT_ENERGY);
+	glm::vec2 currAlive((float)m_optTimes * ((float)1/SENSOR::DEFAULT_ENERGY_LOSS)*SENSOR::DEFAULT_GRAPH_SPEED,(float)(getAlive())/(float)m_numSens);
+	glm::vec2 currActive((float)m_optTimes * ((float)1/SENSOR::DEFAULT_ENERGY_LOSS)*SENSOR::DEFAULT_GRAPH_SPEED,(float)(getActive())/(float)m_numSens);
+	glm::vec2 currCov((float)m_optTimes * ((float)1/SENSOR::DEFAULT_ENERGY_LOSS)*SENSOR::DEFAULT_GRAPH_SPEED,getCoverage());
+	glm::vec2 currEnergy((float)m_optTimes * ((float)1/SENSOR::DEFAULT_ENERGY_LOSS)*SENSOR::DEFAULT_GRAPH_SPEED,getEnergy()/SENSOR::DEFAULT_ENERGY);
 
 
 	Line aliveL(currAlive,lastAlive);

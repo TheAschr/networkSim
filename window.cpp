@@ -21,8 +21,11 @@ GLFWwindow* WINDOW::initWindow(std::string name){
     glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
     glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 	
-    //GLFWwindow* window = glfwCreateWindow(mode->width, mode->height, name.c_str(), monitor, nullptr);
-    GLFWwindow* window = glfwCreateWindow(SCREEN_W, SCREEN_H, name.c_str(), nullptr, nullptr);
+    GLFWwindow* window;
+    if(FULLSCREEN)
+        window = glfwCreateWindow(mode->width, mode->height, name.c_str(), monitor, nullptr);
+    else
+        window = glfwCreateWindow(SCREEN_W, SCREEN_H, name.c_str(), nullptr, nullptr);
     glfwMakeContextCurrent(window);
     
     glewExperimental = GL_TRUE;
@@ -38,7 +41,9 @@ GLFWwindow* WINDOW::initWindow(std::string name){
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     glfwSetKeyCallback(window, key_callback);
-    
+
+    GLfloat lineWidthRange[2];
+    glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, lineWidthRange);    
     if ( !window )
     {
         glfwTerminate( );

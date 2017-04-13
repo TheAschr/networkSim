@@ -23,6 +23,8 @@ namespace WINDOW{
 	const GLuint MAP_SIZE_H = 50;
 	const GLuint MAP_SIZE = MAP_SIZE_W * MAP_SIZE_H;
 
+	const bool FULLSCREEN = true;
+
 	GLFWwindow* initWindow(std::string name);
 
 }
